@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+	<!--这最开始的部分是Hibernate与数据库进行连接并进行表的绑定 -->
+    <!-- 从定位服务器本地读取GIS数据库
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"  
+		destroy-method="close">
+		<property name="driverClassName">
+			<value>com.mysql.jdbc.Driver</value>
+		</property>
+		<property name="url">
+			<value>jdbc:mysql://localhost:3306/location?autoReconnect=true&amp;autoReconnectForPools=true</value>
+		</property>
+		<property name="username">
+			<value>user</value>
+		</property>
+		<property name="password">
+			<value>123</value>
+		</property>
+	</bean>
+	-->
+	<!--修改使用tomcat 7.0自带的tomcat 7.0 JDBC连接池，废弃原先的dbcp -->
+	<!--
+	 <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource"  
+		destroy-method="close">
+		<property name="driverClassName">
+			<value>com.mysql.jdbc.Driver</value>
+		</property>
+		<property name="url">
+			<value>jdbc:mysql://www.indoor-lbs.com:3306/indoorgis?useUnicode=true&amp;characterEncoding=UTF8&amp;autoReconnect=true&amp;autoReconnectForPools=true</value>
+		</property>
+		<property name="username">
+			<value>ruijie</value>
+		</property>
+		<property name="password">
+			<value>N#Ex#GVY&amp;CR26vN#</value>
+		</property>
+		<property name="acquireIncrement" value="3"/>
+		<property name="minPoolSize" value="15"/>
+		<property name="maxPoolSize" value="100"/>
+		<property name="maxStatements" value="100"/>
+		<property name="checkoutTimeout" value="3000"/>
+		<property name="idleConnectionTestPeriod" value="60"/>
+	</bean>
+	-->
+	<bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">  
+		<property name="poolProperties">  
+			<bean class="org.apache.tomcat.jdbc.pool.PoolProperties">  
+				<property name="url" value="jdbc:mysql://localhost:3306/order?useUnicode=true&amp;characterEncoding=UTF8&amp;autoReconnect=true&amp;autoReconnectForPools=true"/>  
+				<property name="driverClassName" value="com.mysql.jdbc.Driver"/>  
+				<property name="username" value="root"/>  
+				<property name="password" value="guolong"/>  
+				<property name="jmxEnabled" value="true"/>  
+				<property name="testWhileIdle" value="false"/>  
+				<property name="testOnBorrow" value="true"/>  
+				<property name="validationInterval" value="30000"/>  
+				<property name="testOnReturn" value="false"/>  
+				<property name="validationQuery" value="select 1"/>  
+				<property name="timeBetweenEvictionRunsMillis" value="30000"/>  
+				<property name="maxActive" value="100"/>  
+				<property name="initialSize" value="20"/>  
+				<property name="maxWait" value="10000"/>  
+				<property name="removeAbandonedTimeout" value="60"/>  
+				<property name="minEvictableIdleTimeMillis" value="30000"/>  
+				<property name="minIdle" value="10"/>  
+				<property name="logAbandoned" value="true"/>  
+				<property name="removeAbandoned" value="true"/>  
+				<property name="jdbcInterceptors" value="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer"/>  
+			</bean>  
+		</property>  
+	</bean>  
+	
+	<bean id="defaultLobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler"
+		lazy-init="true" /> 
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource">
+			<ref local="dataSource" />
+		</property>
+
+		<property name="mappingDirectoryLocations">
+	      <list>
+	        <value>classpath:com/order/pojo/</value> 
+	      </list>
+	    </property>		
+
+		<property name="hibernateProperties">
+			<value>
+				hibernate.dialect=org.hibernate.dialect.MySQL5Dialect
+				hibernate.show_sql=true  
+            </value>
+		</property>
+	</bean>
+
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    
+    <bean id="dishManageDao" class="com.order.dao.DishManageDao" >  
+    	<property name="sessionFactory"  ref ="sessionFactory" />    
+    </bean>
+    
+    <bean name="dishManageViewer"  class="com.order.viewer.DishManageViewer">  
+    	<property name="dishManageDao"  ref ="dishManageDao" />
+    </bean>
+</beans>

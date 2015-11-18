@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC   "-//Hibernate/Hibernate Mapping DTD 3.0//EN"  "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping>
+
+	<class name="com.order.pojo.ConsuInfo" table="consuInfo">
+		<id name="userID" column="userID" type="java.lang.Integer">
+			<generator class="assigned" /> 
+		</id>
+		<property name="userMenu" column="userMenu" type="java.lang.String" />
+		<property name="userMenuCN" column="userMenuCN" type="java.lang.String" />  
+		<property name="totalPrice" column="totalPrice" type="java.lang.Float" />
+	</class>
+   
+</hibernate-mapping>

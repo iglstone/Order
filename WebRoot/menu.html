@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>点餐系统</title>
+	
+    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+    <meta http-equiv="description" content="this is my page">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <META HTTP-EQUIV="Cache-Control" CONTENT="no-cache,no-store, must-revalidate"> 
+	<META HTTP-EQUIV="pragma" CONTENT="no-cache"> 
+	<META HTTP-EQUIV="expires" CONTENT="0">
+    <!--<link rel="stylesheet" type="text/css" href="./styles.css">-->
+	<script type="text/javascript" src="js/jquery-1.10.2.js"></script>
+	<script type="text/javascript" src="js/jquery-ui.js"></script>
+	<script type='text/javascript' src='./dwr/engine.js'></script>
+    <script type='text/javascript' src='./dwr/util.js'></script>         
+    <script type='text/javascript' src='./dwr/interface/DishManageViewer.js'></script>
+  </head>
+  
+  <script type="text/javascript">
+		var menuList = null;
+		var userMenuSet = "";
+		var userMenuCNSet = "";
+		var totalPrice = 0.00;
+		$(function() {
+			requestMenu();
+			$("#button").click(function () {
+				userMenuSet = "";
+				userMenuCNSet = "";
+				totalPrice = 0.00;
+				var index = 0;
+				//menuMain 下input标签遍历
+				console.log($("#menuMain input"));
+				var i = 0;
+				$("#menuMain input").each(function() { 
+					if ($(this).prop('checked')) {  //选中计入消费菜单
+						index = $(this).val();  //checkbox选择项的value值
+						if(index != undefined && index != null) {
+							userMenuSet += menuList[parseInt(index)].id;
+							userMenuCNSet += menuList[parseInt(index)].name;
+							totalPrice += menuList[parseInt(index)].price;
+							userMenuSet += ",";
+							userMenuCNSet += ",";
+							i++;
+						}
+					}
+				});
+				if (i > 0) {
+					userMenuSet = userMenuSet.substring(0, userMenuSet.lastIndexOf(","));
+					userMenuCNSet = userMenuCNSet.substring(0, userMenuCNSet.lastIndexOf(","));
+					var data = {userMenu:userMenuSet, userMenuCN:userMenuCNSet, totalPrice:totalPrice};
+					//console.log("data :" + data)
+					DishManageViewer.addUserConsuInfo(data, {callback: function (ret) {
+						var userID = ret;
+						console.log("userid :"+ userID);
+						if (userID > 0) {
+							alert("提交成功!您的编号为：" + userID);
+						} else {
+							alert("提交失败!");
+						}
+					}, async:false});
+				}
+				console.log("userMenuSet: " + userMenuSet + "  userMenuCNSet: " + userMenuCNSet + "  totalPrice: " + totalPrice);
+			});
+		});
+		
+		//加载菜单
+		function requestMenu() {
+			DishManageViewer.getDishList({callback: function (ret) {
+				menuList = ret;
+				$("#menuMain").empty();
+				for (var i in ret) {
+					$("#menuMain").append("<label for='"  + ret[i].name + "'>" + ret[i].name + "</label><input type='checkbox' value=" + i + " id='" 
+						+ ret[i].name + "' onclick='dishClickFun(this)'/><img src='" + ret[i].mapURL + "'/><label>&nbsp&nbsp&nbsp&nbsp</label>");
+				}
+			}, async:true});
+		}
+		
+		//checkbox点击响应事件
+		function dishClickFun(o) {
+			if ($(o).prop('checked')) {
+				var index = $(o).val();
+				var dishInfo = menuList[index];
+				console.log(dishInfo);
+			}
+		}
+  </script>
+  <body>
+    <div>
+		<form id="menuMain">
+		</form>
+	</div>
+	<br/>
+	<div>
+		<input style="width:80px;height:20px" type="button" value="提交" id="button"> 
+	</div>
+  </body>
+</html>
